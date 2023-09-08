@@ -4,16 +4,8 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"unicode/utf8"
+	"strings"
 )
-
-func trimLastChar(s string) string {
-  r, size := utf8.DecodeLastRuneInString(s)
-  if r == utf8.RuneError && (size == 0 || size == 1) {
-    size = 0
-  }
-  return s[:len(s)-size]
-}
 
 type cliCommand struct {
 	name        string
@@ -36,15 +28,25 @@ func getCommands()map[string]cliCommand {
 	}
 }
 
-func main() {
-	for ;; {
-    reader := bufio.NewReader(os.Stdin)
+func clearInput(str string) []string {
+	lowered := strings.ToLower(str)
+	words := strings.Fields(lowered)
+	return words
+}
 
+func main() {
+	scanner := bufio.NewScanner(os.Stdin)
+	for ;; {
     fmt.Print("Pokedex > ")
 
-    input, _ := reader.ReadString('\n')
-
-		input = trimLastChar(input)
+		scanner.Scan()
+		text := scanner.Text()
+		cleaned := clearInput(text)
+		if (len(cleaned) == 0) {
+			continue
+		}
+		input := cleaned[0]
+		
 		commands := getCommands()
 		command, ok := commands[input]
 		if !ok {
