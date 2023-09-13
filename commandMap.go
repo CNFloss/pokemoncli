@@ -7,6 +7,8 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"pokemoncli/internal/pokecache"
+	"time"
 )
 
 type jsonMappable interface {
@@ -47,12 +49,26 @@ func getPokeAPI(url string) []byte {
 
 var config *Config = &Config{}
 
+var cache pokecache.Cache = pokecache.NewCache(time.Hour)
+
 func commandMap() error {
 	var body []byte
 	if len(config.Results) == 0 {
 		body = getPokeAPI("https://pokeapi.co/api/v2/location-area/")
+		cache.Add("https://pokeapi.co/api/v2/location-area/", body)
 	} else if len(config.Next) != 0 {
+		dat, ok :=  cache.Get(config.Next)
+		if ok {
+			fmt.Println("cache hit!")
+			config.jsonToStruct(dat)
+			for _, loc := range config.Results {
+				fmt.Printf("%s\n", loc.Name)
+			}
+			return nil
+		}
+		fmt.Println("cache miss")
 		body = getPokeAPI(config.Next)
+		cache.Add(config.Next, body)
 	} else {
 		return errors.New("No more locations to get")
 	}
@@ -66,7 +82,18 @@ func commandMap() error {
 func commandMapB() error {
 	var body []byte
 	if len(config.Previous) != 0 {
+		fmt.Println("cache hit!")
+		dat, ok :=  cache.Get(config.Previous)
+		if ok {
+			config.jsonToStruct(dat)
+			for _, loc := range config.Results {
+				fmt.Printf("%s\n", loc.Name)
+			}
+			return nil
+		}
+		fmt.Println("cache miss")
 		body = getPokeAPI(config.Previous)
+		cache.Add(config.Previous, body)
 	} else {
 		return errors.New("No previous locations to get")
 	}
