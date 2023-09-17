@@ -4,13 +4,14 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"pokemoncli/internal/pokeapi"
 	"strings"
 )
 
 type cliCommand struct {
 	name        string
 	description string
-	callback    func() error
+	callback    func(*pokeapi.Client) error
 }
 
 func getCommands()map[string]cliCommand {
@@ -46,6 +47,7 @@ func clearInput(str string) []string {
 
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
+	config := &pokeapi.Client{}
 	for ;; {
     fmt.Print("Pokedex > ")
 
@@ -63,6 +65,6 @@ func main() {
 			fmt.Println("Invalid Command")
 			continue
 		}
-		command.callback()
+		command.callback(config)
 	}
 }
