@@ -5,13 +5,15 @@ import (
 	"fmt"
 	"os"
 	"pokemoncli/internal/pokeapi"
+	"pokemoncli/internal/pokecache"
 	"strings"
+	"time"
 )
 
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*pokeapi.Client) error
+	callback    func(*pokeapi.Client, string) error
 }
 
 func getCommands()map[string]cliCommand {
@@ -36,6 +38,11 @@ func getCommands()map[string]cliCommand {
 			description: "Gets the previous 20 locations areas in the Pokemon world, if not at beginning list",
 			callback:    commandMapB,
 		},
+		"explore": {
+			name:        "explore",
+			description: "takes an area as an argument and returns it's details",
+			callback:    commandExplore,
+		},
 	}
 }
 
@@ -44,6 +51,8 @@ func clearInput(str string) []string {
 	words := strings.Fields(lowered)
 	return words
 }
+
+var cache pokecache.Cache = pokecache.NewCache(time.Hour)
 
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
@@ -58,6 +67,10 @@ func main() {
 			continue
 		}
 		input := cleaned[0]
+		arg := ""
+		if len(cleaned) > 1 {
+			arg = cleaned[1]
+		}
 		
 		commands := getCommands()
 		command, ok := commands[input]
@@ -65,6 +78,10 @@ func main() {
 			fmt.Println("Invalid Command")
 			continue
 		}
-		command.callback(config)
+		if command.name != "explore" && len(arg) > 0 {
+			fmt.Println("this command does not take arguments")
+			continue
+		}
+		command.callback(config, arg)
 	}
 }

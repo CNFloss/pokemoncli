@@ -5,7 +5,7 @@ import (
 	"pokemoncli/internal/pokeapi"
 )
 
-func commandExit(config *pokeapi.Client) error {
+func commandExit(config *pokeapi.Client, arg string) error {
 	os.Exit(0)
 	return nil
 }

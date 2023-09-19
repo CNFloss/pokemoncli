@@ -4,18 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"pokemoncli/internal/pokeapi"
-	"pokemoncli/internal/pokecache"
-	"time"
 )
 
-var cache pokecache.Cache = pokecache.NewCache(time.Hour)
-
-func commandMap(config *pokeapi.Client) error {
+func commandMap(config *pokeapi.Client, arg string) error {
 	// declare empty struct for unmarshaling JSON
 	locationAreas := pokeapi.LocationAreaResp{}
 	// check if this is the first API call
 	if config.Next == nil {
-		firstReq := pokeapi.BaseURL + "/location"
+		firstReq := pokeapi.BaseURL + "/location-area"
 		config.Next = &firstReq
 	} else {
 		// check if API call is cached
@@ -56,7 +52,7 @@ func commandMap(config *pokeapi.Client) error {
 	return nil
 }
 
-func commandMapB(config *pokeapi.Client) error {
+func commandMapB(config *pokeapi.Client, arg string) error {
 	locationAreas := pokeapi.LocationAreaResp{}
 	if config.Previous == nil {
 		fmt.Println("No previous locations")

@@ -1,6 +1,8 @@
 package pokeapi
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 )
@@ -18,5 +20,12 @@ func NewClient() Client {
 		httpClient: http.Client{
 			Timeout: time.Minute,
 		},
+	}
+}
+
+func (c *LocationAreaResp) JsonToStruct(body []byte) {
+	err := json.Unmarshal(body, c)
+	if err != nil {
+			fmt.Println(err)
 	}
 }
