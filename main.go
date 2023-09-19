@@ -18,16 +18,6 @@ type cliCommand struct {
 
 func getCommands()map[string]cliCommand {
 	return map[string]cliCommand{
-		"help": {
-			name:        "help",
-			description: "Displays a help message",
-			callback:    commandHelp,
-		},
-		"exit": {
-			name:        "exit",
-			description: "Exit the Pokedex",
-			callback:    commandExit,
-		},
 		"map": {
 			name:        "map",
 			description: "Gets 20 locations areas in the Pokemon world, subsequent calls get the next 20 until the end of list",
@@ -43,6 +33,31 @@ func getCommands()map[string]cliCommand {
 			description: "takes an area as an argument and returns it's details",
 			callback:    commandExplore,
 		},
+		"catch": {
+			name:        "catch",
+			description: "attempt to catch the pokemon provided as an argument",
+			callback:    commandCatch,
+		},
+		"inspect": {
+			name:        "inspect",
+			description: "shows detail about a caught pokemon provided as an argument",
+			callback:    commandInspect,
+		},
+		"pokedex": {
+			name:        "pokedex",
+			description: "shows all the caught pokemon",
+			callback:    commandPokedex,
+		},
+		"help": {
+			name:        "help",
+			description: "Displays a help message",
+			callback:    commandHelp,
+		},
+		"exit": {
+			name:        "exit",
+			description: "Exit the Pokedex",
+			callback:    commandExit,
+		},
 	}
 }
 
@@ -53,6 +68,7 @@ func clearInput(str string) []string {
 }
 
 var cache pokecache.Cache = pokecache.NewCache(time.Hour)
+var pokemonCache pokecache.PokemonCache = pokecache.NewPokemonCache(time.Hour)
 
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
@@ -78,7 +94,7 @@ func main() {
 			fmt.Println("Invalid Command")
 			continue
 		}
-		if command.name != "explore" && len(arg) > 0 {
+		if len(arg) > 0 && !(command.name == "explore" || command.name == "catch" || command.name == "inspect") {
 			fmt.Println("this command does not take arguments")
 			continue
 		}
