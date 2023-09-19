@@ -35,6 +35,7 @@ func commandCatch(config *pokeapi.Client, arg string) error {
 	if chance > pokemon.BaseExperience / 2 {
 		fmt.Printf("%s was caught! \n", arg)
 		pokemonCache.Add(arg, pokemon)
+		fmt.Println("You may now inspect it with the inspect command.")
 	} else {
 		fmt.Printf("%s escaped! \n", arg)
 	}
